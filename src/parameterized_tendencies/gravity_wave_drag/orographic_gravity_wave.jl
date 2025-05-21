@@ -24,6 +24,8 @@ orographic_gravity_wave_cache(Y, ::Nothing) = (;)
 orographic_gravity_wave_tendency!(Yₜ, Y, p, t, ::Nothing) = nothing
 
 function orographic_gravity_wave_cache(Y, ogw::OrographicGravityWave)
+    # For now, the initialisation of the cache is the same for all types of
+    # orographic gravity wave drag parameterizations
 
     @assert Spaces.topology(Spaces.horizontal_space(axes(Y.c))).mesh.domain isa
             Domains.SphereDomain
@@ -45,8 +47,14 @@ function orographic_gravity_wave_cache(Y, ogw::OrographicGravityWave)
                 Spaces.horizontal_space(axes(Y.c)),
             ).mesh.domain.radius
         topo_info = compute_OGW_info(Y, elevation_rll, radius, γ, h_frac)
+    elseif ogw.topo_info == "linear"
+        # For user-defined analytical tests
+        topo_info = initialize_drag_input_as_fields(Y, ogw.drag_input)
+    else
+        error("topo_info must be one of gfdl_restart, raw_topo, or linear")
     end
 
+    # Prepare cache
     return (;
         Fr_crit = Fr_crit,
         topo_γ = γ,
@@ -77,7 +85,7 @@ function orographic_gravity_wave_cache(Y, ogw::OrographicGravityWave)
 
 end
 
-function orographic_gravity_wave_tendency!(Yₜ, Y, p, t, ::OrographicGravityWave)
+function orographic_gravity_wave_tendency!(Yₜ, Y, p, t, ::FullOrographicGravityWave)
     ᶜT = p.scratch.ᶜtemp_scalar
     (; params) = p
     (; ᶜts, ᶜp) = p.precomputed
@@ -92,6 +100,7 @@ function orographic_gravity_wave_tendency!(Yₜ, Y, p, t, ::OrographicGravityWav
         topo_ᶠτ_sat,
         topo_ᶠVτ,
     ) = p.orographic_gravity_wave
+
     (; topo_U_sat, topo_FrU_sat, topo_FrU_max, topo_FrU_min, topo_FrU_clp) =
         p.orographic_gravity_wave
     (; hmax, hmin, t11, t12, t21, t22) = p.orographic_gravity_wave.topo_info
@@ -351,6 +360,7 @@ function calc_base_flux!(
     @. FrU_sat = Fr_crit * U_sat
     @. FrU_min = Fr_min * U_sat
     @. FrU_max = max(Fr_max * U_sat, FrU_min + eps(FT))
+    ## [U_c] in Garner 2005
     @. FrU_clp = min(FrU_max, max(FrU_min, FrU_sat))
     # total linear drag
     @. τ_l = ((FrU_max)^(2 + γ - ϵ) - (FrU_min)^(2 + γ - ϵ)) / (2 + γ - ϵ)
