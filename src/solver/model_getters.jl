@@ -220,7 +220,6 @@ function get_orographic_gravity_wave_model(parsed_args, ::Type{FT}) where {FT}
     else
         nothing
     end
-end
 
 function get_radiation_mode(parsed_args, ::Type{FT}) where {FT}
     idealized_h2o = parsed_args["idealized_h2o"]
