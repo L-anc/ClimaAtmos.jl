@@ -210,16 +210,15 @@ end
 
 function get_orographic_gravity_wave_model(parsed_args, ::Type{FT}) where {FT}
     ogw_name = parsed_args["orographic_gravity_wave"]
-    @assert ogw_name in (nothing, "gfdl_restart", "raw_topo", "linear")
+    @assert ogw_name in (nothing, "gfdl_restart", "raw_topo")
     return if ogw_name == "gfdl_restart"
-        FullOrographicGravityWave{FT, String}()
+        OrographicGravityWave{FT, String}()
     elseif ogw_name == "raw_topo"
-        FullOrographicGravityWave{FT, String}(topo_info = "raw_topo")
-    elseif ogw_name == "linear"
-        LinearOrographicGravityWave{FT, String}(topo_info = "linear")
+        OrographicGravityWave{FT, String}(topo_info = "raw_topo")
     else
         nothing
     end
+end
 
 function get_radiation_mode(parsed_args, ::Type{FT}) where {FT}
     idealized_h2o = parsed_args["idealized_h2o"]
