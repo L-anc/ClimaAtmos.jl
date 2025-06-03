@@ -27,9 +27,6 @@ function orographic_gravity_wave_cache(Y, ogw::OrographicGravityWave)
     # For now, the initialisation of the cache is the same for all types of
     # orographic gravity wave drag parameterizations
 
-    @assert Spaces.topology(Spaces.horizontal_space(axes(Y.c))).mesh.domain isa
-            Domains.SphereDomain
-
     FT = Spaces.undertype(axes(Y.c))
     (; γ, ϵ, β, h_frac, ρscale, L0, a0, a1, Fr_crit) = ogw
 
@@ -40,6 +37,9 @@ function orographic_gravity_wave_cache(Y, ogw::OrographicGravityWave)
     elseif ogw.topo_info == "raw_topo"
         # TODO: right now this option may easily crash
         # because we did not incorporate any smoothing when interpolate back to model grid
+        @assert Spaces.topology(Spaces.horizontal_space(axes(Y.c))).mesh.domain is a
+            Domains.SphereDomain
+
         elevation_rll =
             AA.earth_orography_file_path(; context = ClimaComms.context(Y.c))
         radius =
@@ -51,6 +51,9 @@ function orographic_gravity_wave_cache(Y, ogw::OrographicGravityWave)
         # For user-defined analytical tests
         topo_info = initialize_drag_input_as_fields(Y, ogw.drag_input)
     else
+        @assert Spaces.topology(Spaces.horizontal_space(axes(Y.c))).mesh.domain is a
+            Domains.SphereDomain
+            
         error("topo_info must be one of gfdl_restart, raw_topo, or linear")
     end
 
@@ -74,7 +77,7 @@ function orographic_gravity_wave_cache(Y, ogw::OrographicGravityWave)
         topo_U_sat = similar(Fields.level(Y.c.ρ, 1)),
         topo_FrU_sat = similar(Fields.level(Y.c.ρ, 1)),
         topo_FrU_max = similar(Fields.level(Y.c.ρ, 1)),
-        topo_FrU_min = similar(Fields.level(Y.c.ρ, 1)),
+        topo_FrU_min = similar(Fields.level(SpacesY.c.ρ, 1)),
         topo_FrU_clp = similar(Fields.level(Y.c.ρ, 1)),
         topo_base_Vτ = similar(Fields.level(Y.c.ρ, 1)),
         topo_k_pbl = similar(Fields.level(Y.c.ρ, 1)),
