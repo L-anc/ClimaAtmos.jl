@@ -224,6 +224,10 @@ function calc_hpoz_latlon(elev, lon, lat, earth_radius)
     return hmax
 end
 
+function linear_OGW_info(ogw)
+    return (;ogw.hmax, ogw.hmin, ogw.t11, ogw.t12, ogw.t21, ogw.t22 )
+end
+
 function compute_OGW_info(Y, elev_data, earth_radius, γ, h_frac)
     # obtain lat, lon, elevation from the elev_data
     FT = Spaces.undertype(Spaces.axes(Y.c))

@@ -276,6 +276,12 @@ Base.@kwdef struct LinearOrographicGravityWave{FT, S} <: OrographicGravityWave
     a0::FT = 0.0
     a1::FT = 0.0
     Fr_crit::FT = 0.7
+    t11::FT = 0
+    t12::FT = 0
+    t21::FT = 0
+    t22::FT = 0
+    hmax::FT = 0
+    hmin::FT = 0
     topo_info::S = "linear"
 end
 

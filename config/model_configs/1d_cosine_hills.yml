@@ -9,6 +9,12 @@ z_max: 21e3
 x_elem: 10
 z_elem: 10
 dz_bottom: 10
+t11: 0
+t12: 0
+t21: 0
+t22: 0
+hmax: 0
+hmin: 0
 dt: "0.7secs"
 t_end: "2days"
 rayleigh_sponge: true
